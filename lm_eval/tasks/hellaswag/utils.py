@@ -3,6 +3,14 @@ import re
 import datasets
 
 
+
+def doc_to_text(doc):
+    prompt = f"Question: {doc['query']}"
+    for i in range(len(doc['choices'])):
+        prompt += f"\n{i}. {doc['choices'][i]}"
+    prompt += "\nAnswer:"
+    return prompt
+
 def preprocess(text):
     text = text.strip()
     # NOTE: Brackets are artifacts of the WikiHow dataset portion of HellaSwag.
@@ -10,7 +18,6 @@ def preprocess(text):
     text = re.sub("\\[.*?\\]", "", text)
     text = text.replace("  ", " ")
     return text
-
 
 def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:
     def _process_doc(doc):

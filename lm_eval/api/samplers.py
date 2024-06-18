@@ -34,37 +34,22 @@ class ContextSampler:
         # get rid of the doc that's the one we're evaluating, if it's in the fewshot
         # TODO: should we just stop people from using fewshot from same split as evaluating?
         selected_docs = [x for x in fewshotex if x != doc][:num_fewshot]
+        full_history = []
+        for doc in selected_docs:
+            if self.config.doc_to_choice is None or isinstance(self.doc_to_text(doc), str):
+                user_text = self.doc_to_text(doc)
+            else:
+                user_text = self.doc_to_choice(doc)[self.doc_to_text(doc)]
+            full_history.append({"role": "user", "content": user_text.strip()})
+            if isinstance(self.doc_to_target(doc), list):
+                assistant_text = str(self.doc_to_target(doc)[0])
+            elif self.config.doc_to_choice is None or isinstance(self.doc_to_target(doc), str):
+                assistant_text = self.doc_to_target(doc)
+            else:
+                assistant_text = str(self.doc_to_choice(doc)[self.doc_to_target(doc)])
+            full_history.append({"role": "assistant", "content": assistant_text.strip()})
 
-        labeled_examples = (
-            self.fewshot_delimiter.join(
-                [
-                    # TODO: is separating doc_to_text and doc_to_target by one space always desired?
-                    (
-                        self.doc_to_text(doc)
-                        if (
-                            self.config.doc_to_choice is None
-                            or isinstance(self.doc_to_text(doc), str)
-                        )
-                        else self.doc_to_choice(doc)[self.doc_to_text(doc)]
-                    )
-                    + self.target_delimiter
-                    + (
-                        str(self.doc_to_target(doc)[0])
-                        if isinstance(self.doc_to_target(doc), list)
-                        else self.doc_to_target(doc)
-                        if (
-                            self.config.doc_to_choice is None
-                            or isinstance(self.doc_to_target(doc), str)
-                        )
-                        else str(self.doc_to_choice(doc)[self.doc_to_target(doc)])
-                    )
-                    for doc in selected_docs
-                ]
-            )
-            + self.fewshot_delimiter
-        )
-
-        return labeled_examples
+        return full_history
 
     def sample(self, n):
         """

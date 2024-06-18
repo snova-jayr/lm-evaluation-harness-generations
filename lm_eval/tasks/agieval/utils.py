@@ -77,7 +77,6 @@ def parse_math_answer(raw_string):
             answer = get_answer_without_dollar_sign(raw_string)
     return answer
 
-
 # code from https://github.com/hendrycks/math/blob/main/modeling/math_equivalence.py
 def _fix_fracs(string):
     substrs = string.split("\\frac")
@@ -220,6 +219,14 @@ def _strip_string(string):
 
     return string
 
+
+def doc_to_target(doc):
+    if len(doc['gold']) == 0:
+        return ['A']
+    try:
+        return ['A', 'B', 'C', 'D', 'E'][:len(doc['choices'])][doc['gold'][0]]
+    except:
+        raise RuntimeError("Could not extract proper answer")
 
 def is_equiv(str1, str2, verbose=False):
     if str1 is None and str2 is None:

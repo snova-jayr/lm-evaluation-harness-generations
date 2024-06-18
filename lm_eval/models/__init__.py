@@ -11,6 +11,8 @@ from . import (
     optimum_lm,
     textsynth,
     vllm_causallms,
+    sambanova,
+    groq,
 )
 
 

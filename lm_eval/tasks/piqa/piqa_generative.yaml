@@ -1,0 +1,24 @@
+task: piqa_generative
+dataset_path: piqa
+dataset_name: null
+output_type: generate_until
+training_split: train
+validation_split: validation
+test_split: null
+fewshot_split: validation
+fewshot_config:
+  sampler: first_n
+doc_to_text: !function utils.doc_to_text
+doc_to_target: label
+should_decontaminate: true
+doc_to_decontamination_query: goal
+generation_kwargs:
+  until:
+    - "</s>"
+    - "\n"
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

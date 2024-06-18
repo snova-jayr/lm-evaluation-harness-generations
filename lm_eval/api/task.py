@@ -579,7 +579,6 @@ class Task(abc.ABC):
                 )
                 + "\n\n"
             )
-
         example = self.doc_to_text(doc)
         return description + labeled_examples + example
 
@@ -972,26 +971,29 @@ class ConfigurableTask(Task):
         if description := self.config.description:
             description = utils.apply_template(self.config.description, doc)
 
+        full_chat_history = []
+        if description.strip() != '':
+            full_chat_history.append({"role": "system", "content": description.strip()})
         if num_fewshot == 0:
-            # always prepend the (possibly empty) task description
-            labeled_examples = description
+            pass
         else:
-            labeled_examples = description + self.sampler.get_context(doc, num_fewshot)
+            full_chat_history.extend(self.sampler.get_context(doc, num_fewshot))
 
         example = self.doc_to_text(doc)
         if self.multiple_input:
-            return labeled_examples
+            return full_chat_history
         else:
             if isinstance(example, str):
-                return labeled_examples + example
+                full_chat_history.append({"role": "user", "content": example.strip()})
+                return full_chat_history
             elif isinstance(example, list):
-                return [labeled_examples + ex for ex in example]
+                raise RuntimeError("list not supported yet")
             elif isinstance(example, int):
                 if self.config.doc_to_choice is not None:
-                    choices = self.doc_to_choice(doc)
-                    return labeled_examples + choices[example]
+                    raise RuntimeError("doc_to_choice not supported yet")
                 else:
-                    return labeled_examples + str(example)
+                    full_chat_history.append({"role": "user", "content": str(example).strip()})
+                    return full_chat_history
 
     def apply_filters(self):
         """Iterates over FilterEnsembles and applies them to instances"""
