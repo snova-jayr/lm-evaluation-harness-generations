@@ -44,3 +44,10 @@ bash_script_templates/run_sambanova_agi_bigbench_tasks.sh
 ```
 
 Here, change the key to your Samba key and the task name to whatever task you want to evaluate.
+
+
+# Changes we made
+
+* Modified some tasks so that we would be able to do generation based comparison rather than prompt logit comparison
+* Modified `lm_eval/api/samplers.py` and `lm_eval/api/task.py` to handle chat history based formatting for optimal results. We saw a significant increase in accuracy on gsm8k_cot for both sambanova and groq. This may be due to the proper format that Llama 3 8B requires. In turn also had to modify `lm_eval/evaluator.py` for the hashing of the prompts due to changing from strings to list
+* Created models for both sambanova (`lm_eval/models/sambanova.py`) and groq (`lm_eval/models/groq.py`)
