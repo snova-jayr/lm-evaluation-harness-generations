@@ -44,7 +44,7 @@ In bash_script_templates/run_sambanova_agi_bigbench_tasks.sh, you need to set SA
     SAMBA_KEY=<INSERTSAMBAKEY> `
 ```
 
-
+Then, you can run the following command: 
 
 ```
 bash_script_templates/run_sambanova_agi_bigbench_tasks.sh
