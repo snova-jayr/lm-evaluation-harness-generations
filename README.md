@@ -38,6 +38,13 @@ bash_script_templates/run_groq_agi_bigbench_tasks.sh
 Here, change the key to your Groq key and the task name to whatever task you want to evaluate.
 
 ## SambaNova
+In bash_script_templates/run_sambanova_agi_bigbench_tasks.sh, you need to set SAMBA_URL and SAMBA_KEY, 
+```bash
+    SAMBA_URL=<INSERTSAMBAURL> 
+    SAMBA_KEY=<INSERTSAMBAKEY> `
+```
+
+
 
 ```
 bash_script_templates/run_sambanova_agi_bigbench_tasks.sh
