@@ -19,21 +19,22 @@ def invoke_predict(inps, tuningParams, url, key):
     url=f'https://{url}/api/v1/chat/completion'
     headers = {"Authorization": f"Basic {key}",
                "Content-Type": "application/json"}
-    payload = {'inputs': inps, 'params': tuningParams, "expert": "llama3-8b"}
+    payload = [{'inputs': inps,"max_tokens": 800,"stop": ['<|eot_id|>'],"model": "llama3-8b"}]
     responses = requests.post(url, json=payload, headers=headers)
     response_text = ""
     for line in responses.iter_lines():
         if line.startswith(b"data: "):
             data_str = line.decode('utf-8')[6:]
             try:
-                line_json = json.loads(data_str)
+                line_json = json.loads(data_str)["0"]
                 content = line_json.get("stream_token", "")
                 if content:
                     response_text += content
             except json.JSONDecodeError as e:
-                st.error(f"JSON decode error: {e}")
-                st.error(f"Problematic line: {line}")
+                print(f"JSON decode error: {e}")
+                print(f"Problematic line: {line}")
     return [response_text]
+
 
 def invoke_model(inps, tuningParams, url, key):
     """Query OpenAI API for completion.
